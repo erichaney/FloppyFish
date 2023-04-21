@@ -10,6 +10,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.text.Font;
 import javafx.scene.image.Image;
+import javafx.scene.media.AudioClip;
 
 public class FloppyFishApp extends Application
 {
@@ -18,6 +19,12 @@ public class FloppyFishApp extends Application
 
     Image fishImage;
     Image sharkImage;
+
+    AudioClip splash;
+    AudioClip bloop;
+    AudioClip uhoh;
+
+    boolean gameOverSoundPlayed;
 
     public void start(Stage stage)
     {
@@ -37,6 +44,14 @@ public class FloppyFishApp extends Application
         fishImage = new Image("fish.png");
         sharkImage = new Image("shark.png");
 
+        gameOverSoundPlayed = false;
+
+        
+        String pathToSoundsFolder = getClass().getResource("sounds/").toExternalForm();
+        splash = new AudioClip(pathToSoundsFolder + "splash.wav");
+        bloop = new AudioClip(pathToSoundsFolder + "bloop.wav");
+        uhoh = new AudioClip(pathToSoundsFolder + "uhoh.wav");
+
         GameTimer timer = new GameTimer();
         timer.start();
     }
@@ -46,11 +61,13 @@ public class FloppyFishApp extends Application
         if (e.getCode() == KeyCode.SPACE)
         {
             game.player.jump();
+            bloop.play();
         }
 
         if (e.getCode() == KeyCode.ENTER && game.isGameOver)
         {
             game = new Game();
+            gameOverSoundPlayed = false;
         }
     }
 
@@ -60,7 +77,7 @@ public class FloppyFishApp extends Application
         for (Obstacle o : game.obstacles)
         {
             //gc.fillOval(o.x, o.y, o.width, o.height);
-            
+
             if (o.getClass() == Shark.class)
             {
                 gc.drawImage(sharkImage, o.x, o.y);
@@ -104,6 +121,11 @@ public class FloppyFishApp extends Application
         if (game.isGameOver == true)
         {
             drawGameOver();
+            if (gameOverSoundPlayed == false)
+            {
+                uhoh.play();
+                gameOverSoundPlayed = true;
+            }
         }
     }
 
